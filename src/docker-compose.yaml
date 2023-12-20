@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  usersdb:
+    container_name: usersdb
+    image: 'postgres:latest'
+    volumes:
+      - 'usersdb_data:/var/lib/postgresql/data'
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+  authprovider:
+    container_name: authprovider
+    image: 'jboss/keycloak:latest'
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: usersdb
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: Pa55w0rd
+    volumes:
+      - 'authprovider_data:/opt/jboss/keycloak/standalone/data'
+    ports:
+      - '8080:8080'
+    depends_on:
+      - usersdb
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    ports:
+      - '5050:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@mail.com
+      PGADMIN_DEFAULT_PASSWORD: Pa55w0rd
+    depends_on:
+      - usersdb
+volumes:
+  usersdb_data: null
+  authprovider_data: null

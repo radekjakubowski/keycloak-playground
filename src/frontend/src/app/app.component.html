@@ -1,0 +1,7 @@
+@if (isLoggedIn()) {
+  <button (click)="logout()">Logout</button>
+} @else {
+  <button (click)="login()">Login</button>
+}
+
+<button (click)="makeAuthorizedServerCall()">Call authorized server</button>
