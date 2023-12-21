@@ -1,20 +1,21 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using server.Services;
+using ProfileService.Infrastructure.Authrorization;
+using ProfileService.Infrastructure.Persistence;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddTransient<IClaimsTransformation, TokenTransformationService>(); // service which transforms realm_access tokens from keycloak into identity
+builder.Services.AddTransient<IClaimsTransformation, KeycloakClaimsTransformation>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("default",
@@ -42,7 +43,13 @@ builder.Services.AddAuthentication(opts =>
     };
 });
 
-var app = builder.Build();
+builder.Services.AddDbContext<ProfileServiceDbContext>(opts =>
+{
+    var connectionString = builder.Configuration.GetValue<string>("ConnectionStrings:UsersDb");
+    opts.UseNpgsql(connectionString);
+});
+
+var app = builder.Build();\
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -51,12 +58,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("default");
-
 app.UseHttpsRedirection();
+
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 app.Run();

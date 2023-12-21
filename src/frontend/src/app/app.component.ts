@@ -34,14 +34,4 @@ export class AppComponent implements OnInit {
   login() {
     this.authService.authorize();
   }
-
-  makeAuthorizedServerCall() {
-    const headers = new HttpHeaders()
-      .set('Authorization', `Bearer ${this.token ?? ''}`)
-      .set('Content-Type', 'application/json')
-      .set('Access-Control-Allow-Origin', 'http://localhost:4200')
-      .set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,DELETE,PUT')
-
-    this.http.get("http://localhost:5000/weatherforecast", { headers }).subscribe((forecast: any) => console.log(forecast));
-  }
 }

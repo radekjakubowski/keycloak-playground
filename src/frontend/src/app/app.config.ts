@@ -17,7 +17,8 @@ const config: OpenIdConfiguration = {
     silentRenew: true,
     ignoreNonceAfterRefresh: true,
     triggerRefreshWhenIdTokenExpired: false,
-    logLevel: LogLevel.Debug
+    logLevel: LogLevel.Warn,
+    historyCleanupOff: false
   }
 
 export const appConfig: ApplicationConfig = {
